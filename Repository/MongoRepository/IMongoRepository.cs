@@ -13,9 +13,16 @@ namespace Repository.MongoRepository
         IEnumerable<TDocument> FilterBy(
             Expression<Func<TDocument, bool>> filterExpression);
 
+        IEnumerable<TDocument> FilterBy(
+            Expression<Func<TDocument, bool>> filterExpression, int pageSize, int pageIndex);
+
         IEnumerable<TProjected> FilterBy<TProjected>(
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, TProjected>> projectionExpression);
+
+        IEnumerable<TProjected> FilterBy<TProjected>(
+            Expression<Func<TDocument, bool>> filterExpression,
+            Expression<Func<TDocument, TProjected>> projectionExpression, int pageSize, int pageIndex);
 
         TDocument FindOne(Expression<Func<TDocument, bool>> filterExpression);
 

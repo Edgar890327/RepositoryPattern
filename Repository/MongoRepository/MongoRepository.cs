@@ -24,7 +24,7 @@ namespace Repository.MongoRepository
             return ((BsonCollectionAttribute)documentType.GetCustomAttributes(
                     typeof(BsonCollectionAttribute),
                     true)
-                .FirstOrDefault())?.CollectionName;
+                .FirstOrDefault())?.CollectionName ?? documentType.Name;
         }
 
         public virtual IQueryable<TDocument> AsQueryable()
@@ -38,11 +38,30 @@ namespace Repository.MongoRepository
             return _collection.Find(filterExpression).ToEnumerable();
         }
 
+        public virtual IEnumerable<TDocument> FilterBy(
+            Expression<Func<TDocument, bool>> filterExpression, int pageSize, int pageIndex)
+        {
+            var cursor = _collection.Find(filterExpression);
+
+            cursor.Skip(pageIndex * pageSize);
+            cursor.Limit(pageSize);
+            return cursor.ToEnumerable();
+        }
+
         public virtual IEnumerable<TProjected> FilterBy<TProjected>(
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, TProjected>> projectionExpression)
         {
             return _collection.Find(filterExpression).Project(projectionExpression).ToEnumerable();
+        }
+        public virtual IEnumerable<TProjected> FilterBy<TProjected>(
+            Expression<Func<TDocument, bool>> filterExpression,
+            Expression<Func<TDocument, TProjected>> projectionExpression, int pageSize, int pageIndex)
+        {
+            var cursor = _collection.Find(filterExpression).Project(projectionExpression);
+            cursor.Skip(pageIndex * pageSize);
+            cursor.Limit(pageSize);
+            return cursor.ToEnumerable();
         }
 
         public virtual TDocument FindOne(Expression<Func<TDocument, bool>> filterExpression)
